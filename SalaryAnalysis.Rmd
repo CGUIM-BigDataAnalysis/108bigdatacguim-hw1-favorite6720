@@ -1,7 +1,7 @@
 ---
 title: "108-2 大數據分析方法 作業一"
 output: github_document
-author: 李家郁
+author: put your name here
 ---
 
 搞不清楚各行各業的薪資差異嗎? 念研究所到底對第一份工作的薪資影響有多大? CP值高嗎? 透過分析**初任人員平均經常性薪資**- （107年）https://data.gov.tw/dataset/6647 （104-105年）http://ipgod.nchc.org.tw/dataset/a17000000j-020066 ，可初步了解台灣近幾年各行各業、各學歷的起薪。
@@ -12,61 +12,23 @@ author: 李家郁
 ```{r dataload}
 library(readr)
 library(dplyr)
-salary104 <- read_csv("C:/Users/USER/Desktop/salary104.csv")#讀檔
-salary107 <- read_csv("C:/Users/USER/Desktop/salary107.csv")#讀檔
-#第一題
-
-#修改資料型態
-salary104[,c(-1,-2)]<-apply(salary104[,c(-1,-2)],2,function(x){as.numeric(gsub("—|…",NA,x))})%>%as.data.frame()
-salary107[,c(-1,-2)]<-apply(salary107[,c(-1,-2)],2,function(x){as.numeric(gsub("—|…",NA,x))})%>%as.data.frame()
-
-#用anti_join比較不同處
-anti104<-anti_join(salary104,salary107,by ="大職業別")
-anti107<-anti_join(salary107,salary104,by ="大職業別")
-
-#統一職業名稱
-salary104$大職業別<-gsub("部門","",salary104$大職業別)
-salary104$大職業別<-gsub("、","_",salary104$大職業別)
-salary104$大職業別<-gsub("營造業","營建工程",salary104$大職業別)
-salary104$大職業別<-gsub("資訊及通訊傳播業","出版、影音製作、傳播及資通訊服務業",salary104$大職業別)
-salary104$大職業別<-gsub("教育服務業","教育業",salary104$大職業別)
-salary104$大職業別<-gsub("醫療保健服務業","醫療保健業",salary104$大職業別)
-
-#Join 104和107年度表格
-salary<-left_join(salary104, salary107, by ="大職業別" )
-salary$Calculation<-salary$`大學-薪資.y`/salary$`大學-薪資.x`#計算107年度大學畢業薪資 / 104年度大學畢業薪資
 
 ```
 
 ### 107年度薪資較104年度薪資高的職業有哪些? 
 ```{r compare103106}
-#107年度薪資較104年度薪資高的職業
-salarytop10<- select(salary,大職業別,Calculation)%>%
-  filter(Calculation>1)%>%
-  arrange(desc(Calculation))%>%
-  head(10)
-knitr::kable(salarytop10)
+#這是R Code Chunk
 ```
 
-從表格可看出107年度薪資較104年度薪資高的前十個職業中"教育業"就佔了四個，其中"專業_科學及技術服務業-服務及銷售工作人員	"的提高比例最多。
-
-### 提高超過5%的職業有哪些? 
+### 提高超過5%的的職業有哪些? 
 ```{r over5}
-#提高超過5%的職業
-salaryraise<- select(salary,大職業別,Calculation)%>%
-  filter(Calculation>1.05)%>%
-  arrange(desc(Calculation))
-knitr::kable(salaryraise)
+#這是R Code Chunk
 ```
 
 ### 主要的職業種別是哪些種類呢?
 ```{r mainType}
-#主要的職業種別;字串處理;分析出現次數
-job<-strsplit(salaryraise$大職業別,"-")%>%sapply("[",1)
-knitr::kable(table(job))
+#這是R Code Chunk
 ```
-
-提高超過5%的職業中主要以"不動產業"、"出版、影音製作、傳播及資通訊服務業"、"金融及保險業"、"運輸及倉儲業"、"藝術_娛樂及休閒服務業"為主，這五個職業就佔了提高超過5%的職業中的一半左右。
 
 ## 男女同工不同酬現況分析
 
@@ -74,71 +36,30 @@ knitr::kable(table(job))
 
 ### 104和107年度的大學畢業薪資資料，哪些行業男生薪資比女生薪資多?
 ```{r male}
-#第二題
-#104年男生薪資比女生薪資多
-men_higher104<-select(salary104,大職業別,`大學-女/男`)%>%
-  filter(`大學-女/男`<100)%>%
-  arrange(`大學-女/男`)%>%
-  head(10)
-knitr::kable(men_higher104)
-#107年男生薪資比女生薪資多
-men_higher107<-select(salary107,大職業別,`大學-女/男`)%>%
-  filter(`大學-女/男`<100)%>%
-  arrange(`大學-女/男`)%>%
-  head(10)
-knitr::kable(men_higher107)
+#這是R Code Chunk
 ```
-
-從表格發現男生薪資比女生薪資多的職業大部分與水電、土木有關。104和107年度的大學畢業薪資資料中可看出男女薪資比例差距有縮小，從104年91.69到107年變為96.02，代表男女同工不同酬的問題有持續改善。
-
-
 ### 哪些行業女生薪資比男生薪資多? 
 ```{r female}
-#104年女生薪資比男生薪資多
-women_higher104<-select(salary104,大職業別,`大學-女/男`)%>%
-  filter(`大學-女/男`>=100)%>%
-  arrange(desc(`大學-女/男`))%>%
-  head(10)
-knitr::kable(women_higher104)
-#107年女生薪資比男生薪資多
-women_higher107<-select(salary107,大職業別,`大學-女/男`)%>%
-  filter(`大學-女/男`>=100)%>%
-  arrange(desc(`大學-女/男`))%>%
-  head(10)
-knitr::kable(women_higher107)
+#這是R Code Chunk
 ```
-
-104年度的大學畢業薪資資料中只有"專業_科學及技術服務業-技藝_機械設備操作及組裝人員"是女生薪資高於男生，但高出的比例也不多;107年度的大學畢業薪資沒有任何職業是女生薪水比男生高的，而且也只有少數行業是男女薪水一樣的，代表男女同工不同酬的問題還是存在的。
 
 ## 研究所薪資差異
 
 以107年度的資料來看，哪個職業別念研究所最划算呢 (研究所學歷薪資與大學學歷薪資增加比例最多)?
  
 ```{r grad}
-#第三題
-compare107<-select(salary107,大職業別,`大學-薪資`,`研究所-薪資`)
-compare107<-mutate(compare107,rate107=salary107$`研究所-薪資`/salary107$`大學-薪資`)%>%
-  arrange(desc(rate107))%>%
-  head(10)
-knitr::kable(compare107)
+#這是R Code Chunk
 ```
-
-"其他服務業"是研究所學歷薪資增加比例最多的，也就是念研究所最划算的職業。
 
 ## 我有興趣的職業別薪資狀況分析
 
 ### 有興趣的職業別篩選，呈現薪資
 ```{r like}
-#第四題
-interest<-select(salary107,大職業別,`大學-薪資`,`研究所-薪資`)%>%
-  filter(salary107$大職業別%in%c("出版、影音製作、傳播及資通訊服務業-技術員及助理專業人員","出版、影音製作、傳播及資通訊服務業-事務支援人員","運輸及倉儲業-專業人員","出版、影音製作、傳播及資通訊服務業-專業人員","運輸及倉儲業-技術員及助理專業人員"))
-knitr::kable(interest)
+#這是R Code Chunk
 ```
 
 ### 這些職業別研究所薪資與大學薪資差多少呢？
 ```{r likeGrad}
-interest<-mutate(interest,薪資差=`研究所-薪資`-`大學-薪資`)
-knitr::kable(interest[,c("大職業別","薪資差")])
+#這是R Code Chunk
 ```
 
-我依然不想念研究所，比起念書我更想直接去上班增加實戰經驗，唸完研究所的薪資其實並沒有差很多，所以我堅持我的決定。
